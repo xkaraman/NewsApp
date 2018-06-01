@@ -4,10 +4,12 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -122,10 +124,17 @@ public class ArticleActivity extends AppCompatActivity
     @Override
     public Loader<List<Article>> onCreateLoader(int i, Bundle bundle) {
 
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // getString retrieves a String value from the preferences.
+        // The second parameter is the default value for this preference.
+        String query = sharedPrefs.getString(getString(R.string.settings_query_key),
+                getString(R.string.settings_query_default));
+
         Uri baseUri = Uri.parse(GUARDIAN_REQUEST_URL);
         Uri.Builder uriBuilder = baseUri.buildUpon();
 
-        uriBuilder.appendQueryParameter("q", "marvel");
+        uriBuilder.appendQueryParameter("q", query);
         uriBuilder.appendQueryParameter("api-key", "test");
         uriBuilder.appendQueryParameter("show-tags", "contributor");
 
