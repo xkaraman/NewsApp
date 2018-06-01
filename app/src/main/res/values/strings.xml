@@ -2,4 +2,7 @@
     <string name="app_name">NewsApp</string>
     <string name="no_internet_connection">Please check your Internet Connection.</string>
     <string name="no_new_articles">No articles found or The Guardian servers are down.</string>
+    <string name="settings_menu_item">Settings</string>
+    <string name="settings_title">Search Settings</string>
+
 </resources>
