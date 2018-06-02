@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<List<Article>> {
+        implements LoaderManager.LoaderCallbacks<List<Article>>,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     private ArticleAdapter mAdapter;
 
@@ -40,7 +42,6 @@ public class ArticleActivity extends AppCompatActivity
      */
     private static final int ARTICLE_LOADER_ID = 1;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +55,11 @@ public class ArticleActivity extends AppCompatActivity
         mAdapter = new ArticleAdapter(this, new ArrayList<Article>());
         articlesList.setAdapter(mAdapter);
 
+        // Obtain a reference to the SharedPreferences file for this app
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // And register to be notified of preference changes
+        // So we know when the user has adjusted the query settings
+        prefs.registerOnSharedPreferenceChangeListener(this);
 
         // Set an item click listener on the ListView, which sends an intent to a web browser
         // to open a website with more information about the selected article.
@@ -81,11 +87,11 @@ public class ArticleActivity extends AppCompatActivity
         // Get details on the currently active default data network
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
+
         // If there is a network connection, fetch data
         if (networkInfo != null && networkInfo.isConnected()) {
             // Get a reference to the LoaderManager, in order to interact with loaders.
             LoaderManager loaderManager = getLoaderManager();
-
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
             // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
             // because this activity implements the LoaderCallbacks interface).
@@ -98,7 +104,27 @@ public class ArticleActivity extends AppCompatActivity
 
             // Update empty state with no connection error message
             mEmptyStateTextView.setText(R.string.no_internet_connection);
+        }
+    }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.e("Change in preference", "Muste restart loader");
+
+        if (key.equals(getString(R.string.settings_query_key))) {
+            // Clear the ListView as a new query will be kicked off
+            mAdapter.clear();
+
+            // Hide the empty state text view as the loading indicator will be displayed
+            mEmptyStateTextView.setVisibility(View.GONE);
+
+            // Show the loading indicator while new data is being fetched
+            View loadingIndicator = findViewById(R.id.loading_indicator);
+            loadingIndicator.setVisibility(View.VISIBLE);
+
+            Log.e("Change in preference", "restart loader");
+            // Restart the loader to requery the TheGuardian as the query settings have been updated
+            getLoaderManager().restartLoader(ARTICLE_LOADER_ID, null, this);
         }
     }
 
@@ -135,10 +161,10 @@ public class ArticleActivity extends AppCompatActivity
         Uri.Builder uriBuilder = baseUri.buildUpon();
 
         uriBuilder.appendQueryParameter("q", query);
-        uriBuilder.appendQueryParameter("api-key", "test");
+        uriBuilder.appendQueryParameter("api-key", "6259b533-6251-4c6f-9de9-e96d2d6a1520");
         uriBuilder.appendQueryParameter("show-tags", "contributor");
 
-        //Log.e("ONCREATELOADER", uriBuilder.toString());
+        Log.e("ONCREATELOADER", uriBuilder.toString());
         return new ArticleLoader(this, uriBuilder.toString());
     }
 

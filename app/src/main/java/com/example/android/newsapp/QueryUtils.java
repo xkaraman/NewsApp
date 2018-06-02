@@ -31,7 +31,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -182,10 +181,12 @@ public final class QueryUtils {
                 // For a given new, extract the JSONObject associated with the
                 // key called "tags", which represents a list of all tags
                 JSONArray tags = currentArticle.getJSONArray("tags");
-                JSONObject currentTag = tags.getJSONObject(0);
-                // Extract the value for the key called webTitle in 'tags' JSON Object
-                String author = currentTag.getString("webTitle");
-
+                String author = "";
+                if (tags.length() != 0) {
+                    JSONObject currentTag = tags.getJSONObject(0);
+                    // Extract the value for the key called webTitle in 'tags' JSON Object
+                    author = currentTag.getString("webTitle");
+                }
                 // Extract the value for the key called "sectionName"
                 String sectionName = currentArticle.getString("sectionName");
 

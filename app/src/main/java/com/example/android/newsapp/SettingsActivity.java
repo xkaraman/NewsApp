@@ -32,7 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
             // The code in this method takes care of updating the displayed preference summary after it has been changed
             String stringValue = newValue.toString();
             preference.setSummary(stringValue);
-            return false;
+            return true;
         }
 
         private void bindPreferenceSummaryToValue(Preference preference) {
