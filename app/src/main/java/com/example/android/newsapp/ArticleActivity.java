@@ -111,7 +111,8 @@ public class ArticleActivity extends AppCompatActivity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.e("Change in preference", "Muste restart loader");
 
-        if (key.equals(getString(R.string.settings_query_key))) {
+        if (key.equals(getString(R.string.settings_query_key)) ||
+                key.equals(getString(R.string.settings_order_by_key))) {
             // Clear the ListView as a new query will be kicked off
             mAdapter.clear();
 
@@ -157,12 +158,15 @@ public class ArticleActivity extends AppCompatActivity
         String query = sharedPrefs.getString(getString(R.string.settings_query_key),
                 getString(R.string.settings_query_default));
 
+        String orderBy = sharedPrefs.getString(getString(R.string.settings_order_by_key),
+                getString(R.string.settings_order_by_default));
         Uri baseUri = Uri.parse(GUARDIAN_REQUEST_URL);
         Uri.Builder uriBuilder = baseUri.buildUpon();
 
         uriBuilder.appendQueryParameter("q", query);
         uriBuilder.appendQueryParameter("api-key", "6259b533-6251-4c6f-9de9-e96d2d6a1520");
         uriBuilder.appendQueryParameter("show-tags", "contributor");
+        uriBuilder.appendQueryParameter("order-by",orderBy);
 
         Log.e("ONCREATELOADER", uriBuilder.toString());
         return new ArticleLoader(this, uriBuilder.toString());
